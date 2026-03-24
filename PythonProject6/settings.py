@@ -165,3 +165,20 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+
+# Автоматическое создание суперпользователя при запуске (только в продакшене)
+if not DEBUG and 'DATABASE_URL' in os.environ:
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+    if not User.objects.filter(is_superuser=True).exists():
+        username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
+        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
+        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123456')
+
+        User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password
+        )
