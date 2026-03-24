@@ -64,7 +64,6 @@ class Building(models.Model):
         verbose_name_plural = 'Дома'
         ordering = ['address']
 
-
 class Request(models.Model):
     """Main request/ticket model for JKH issues."""
 
@@ -131,9 +130,9 @@ class Request(models.Model):
     final_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     # Images (optional)
-    image1 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
-    image2 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
-    image3 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
+    #image1 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
+    #image2 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
+    #image3 = models.ImageField(upload_to='requests/%Y/%m/%d/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.get_type_display()} - {self.title}"

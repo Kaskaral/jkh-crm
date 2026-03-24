@@ -30,7 +30,7 @@ class RequestForm(forms.ModelForm):
         fields = [
             'title', 'type', 'description', 'priority', 'building',
             'apartment_number', 'floor', 'estimated_completion',
-            'cost_estimate', 'image1', 'image2', 'image3'
+            'cost_estimate'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
