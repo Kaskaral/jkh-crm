@@ -2,7 +2,7 @@ services:
   - type: web
     name: jkh-crm
     env: python
-    region: frankfurt # или другой регион
+    region: frankfurt  # или твой регион
     buildCommand: "pip install -r requirements.txt"
     startCommand: "./run.sh"
     envVars:
@@ -14,3 +14,14 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: "1"
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
+
+databases:
+  - name: jkh-crm-db
+    databaseName: jkh_crm_db
+    user: jkh_user
