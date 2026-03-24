@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: jkh-crm
+    env: python
+    region: frankfurt # или другой регион
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "./run.sh"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jkh-crm-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: "1"
