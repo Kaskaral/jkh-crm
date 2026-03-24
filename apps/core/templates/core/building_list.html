@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Список домов{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="display-6 mb-0">
+                <i class="bi bi-house-door"></i> Список домов
+            </h1>
+            {% if user.profile.role == 'admin' %}
+                <a href="{% url 'core:building_create' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle"></i> Добавить новый дом
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Дома ({{ buildings|length }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if buildings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Адрес</th>
+                                        <th>Координаты</th>
+                                        <th>Квартиры</th>
+                                        <th>Площадь (м²)</th>
+                                        <th>Год постройки</th>
+                                        <th>Заявок</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for building in buildings %}
+                                        <tr>
+                                            <td><strong>{{ building.id }}</strong></td>
+                                            <td>
+                                                <a href="{% url 'core:building_map' %}?building={{ building.id }}" class="text-decoration-none">
+                                                    {{ building.address }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {% if building.latitude and building.longitude %}
+                                                    <span class="badge bg-info">
+                                                        {{ building.latitude|floatformat:4 }}, {{ building.longitude|floatformat:4 }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ building.total_apartments }}</td>
+                                            <td>{{ building.total_area }}</td>
+                                            <td>
+                                                {% if building.year_built %}
+                                                    {{ building.year_built }}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'core:request_list' %}?building={{ building.id }}" class="badge bg-primary">
+                                                    {{ building.requests.count }} заявок
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{% url 'core:building_map' %}?building={{ building.id }}" class="btn btn-sm btn-outline-info" title="На карте">
+                                                        <i class="bi bi-map"></i>
+                                                    </a>
+                                                    <a href="{% url 'core:request_list' %}?building={{ building.id }}" class="btn btn-sm btn-outline-primary" title="Заявки">
+                                                        <i class="bi bi-ticket-perforated"></i>
+                                                    </a>
+                                                    <a href="{% url 'core:building_edit' building.pk %}" class="btn btn-sm btn-outline-warning" title="Редактировать">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="{% url 'core:building_delete' building.pk %}" class="btn btn-sm btn-outline-danger" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этот дом?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-house fs-1 text-muted mb-3 d-block"></i>
+                            <p class="text-muted fs-5">Нет домов для отображения</p>
+                            {% if user.profile.role == 'admin' %}
+                                <a href="{% url 'core:building_create' %}" class="btn btn-primary mt-3">
+                                    <i class="bi bi-plus-circle"></i> Добавить первый дом
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

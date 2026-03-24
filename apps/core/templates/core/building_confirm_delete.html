@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить дом{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Подтверждение удаления
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5><i class="bi bi-exclamation-octagon"></i> Внимание!</h5>
+                        <p>Вы собираетесь удалить дом:</p>
+                        <p class="fs-4"><strong>{{ building.address }}</strong></p>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Информация о доме</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Адрес:</strong> {{ building.address }}</p>
+                            <p><strong>Количество квартир:</strong> {{ building.total_apartments }}</p>
+                            <p><strong>Общая площадь:</strong> {{ building.total_area }} м²</p>
+                            {% if building.year_built %}
+                                <p><strong>Год постройки:</strong> {{ building.year_built }}</p>
+                            {% endif %}
+                            <p><strong>Заявок в системе:</strong> <span class="badge bg-primary">{{ building.requests.count }}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i> <strong>Важно:</strong> Все заявки, связанные с этим домом, также будут удалены!
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'building_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот дом и все связанные заявки?')">
+                                <i class="bi bi-trash"></i> Удалить навсегда
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

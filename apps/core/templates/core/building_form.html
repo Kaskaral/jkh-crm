@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if action == 'create' %}Добавить новый дом{% else %}Редактировать дом{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                {% if action == 'create' %}
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">
+                            <i class="bi bi-house-door-fill"></i> Добавить новый дом
+                        </h3>
+                    </div>
+                {% else %}
+                    <div class="card-header bg-warning text-white">
+                        <h3 class="mb-0">
+                            <i class="bi bi-house-door-fill"></i> Редактировать дом
+                        </h3>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+                            <!-- Левая колонка: Расположение -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Расположение</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Адрес -->
+                                        <div class="mb-3">
+                                            {{ form.address|as_crispy_field }}
+                                            <small class="text-muted d-block mt-1">Пример: ул. Ленина, д. 1</small>
+                                        </div>
+
+                                        <!-- Координаты -->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form.latitude|as_crispy_field }}
+                                                <small class="text-muted d-block mt-1">Широта (например: 55.7558)</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form.longitude|as_crispy_field }}
+                                                <small class="text-muted d-block mt-1">Долгота (например: 37.6173)</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Подсказка -->
+                                        <div class="alert alert-info alert-dismissible fade show mb-0" role="alert">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>Подсказка:</strong> Координаты можно найти на
+                                            <a href="https://yandex.ru/maps/" target="_blank" class="alert-link">Яндекс.Картах</a>
+                                            или
+                                            <a href="https://www.google.com/maps" target="_blank" class="alert-link">Google Maps</a>.
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Правая колонка: Характеристики -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="bi bi-building"></i> Характеристики дома</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Квартиры -->
+                                        <div class="mb-3">
+                                            {{ form.total_apartments|as_crispy_field }}
+                                            <small class="text-muted d-block mt-1">Общее количество квартир</small>
+                                        </div>
+
+                                        <!-- Площадь -->
+                                        <div class="mb-3">
+                                            {{ form.total_area|as_crispy_field }}
+                                            <small class="text-muted d-block mt-1">Общая площадь здания, м²</small>
+                                        </div>
+
+                                        <!-- Год постройки -->
+                                        <div class="mb-3">
+                                            {{ form.year_built|as_crispy_field }}
+                                            <small class="text-muted d-block mt-1">Год постройки здания</small>
+                                        </div>
+
+                                        <!-- Описание -->
+                                        <div class="mb-3">
+                                            {{ form.description|as_crispy_field }}
+                                            <small class="text-muted d-block mt-1">Дополнительная информация о доме</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <a href="{% url 'core:building_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Отмена
+                            </a>
+                            {% if action == 'create' %}
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Добавить дом
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-pencil-square"></i> Сохранить изменения
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

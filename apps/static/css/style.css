@@ -1,0 +1,121 @@
+/* Custom styles for JKH CRM */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Tables */
+.table {
+    font-size: 0.9rem;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.3rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 0.3rem;
+    border: none;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 0.3rem;
+}
+
+.form-select {
+    border-radius: 0.3rem;
+}
+
+/* Footer */
+footer {
+    margin-top: 2rem;
+}
+
+/* Custom utilities */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+}

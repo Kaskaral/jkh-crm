@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if action == 'create' %}
+        Создать заявку
+    {% else %}
+        Редактировать заявку
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        {% if action == 'create' %}
+                            <i class="bi bi-plus-circle"></i> Создать новую заявку
+                        {% else %}
+                            <i class="bi bi-pencil"></i> Редактировать заявку
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-info-circle"></i> Основная информация</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.title|as_crispy_field }}
+                                        {{ form.type|as_crispy_field }}
+                                        {{ form.priority|as_crispy_field }}
+                                        {{ form.building|as_crispy_field }}
+                                        {{ form.apartment_number|as_crispy_field }}
+                                        {{ form.floor|as_crispy_field }}
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-calendar"></i> Планирование</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.estimated_completion|as_crispy_field }}
+                                        {{ form.cost_estimate|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-card-text"></i> Описание проблемы</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ form.description|as_crispy_field }}
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-images"></i> Изображения (необязательно)</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle"></i> Вы можете загрузить до 3 изображений для документирования проблемы
+                                        </div>
+                                        {{ form.image1|as_crispy_field }}
+                                        {{ form.image2|as_crispy_field }}
+                                        {{ form.image3|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'core:request_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Отмена
+                            </a>
+                            {% if action == 'create' %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Создать заявку
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Сохранить изменения
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

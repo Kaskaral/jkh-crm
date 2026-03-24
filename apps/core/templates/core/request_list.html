@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Список заявок{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="display-6 mb-0">
+                <i class="bi bi-ticket-perforated"></i> Список заявок
+            </h1>
+            {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                <a href="{% url 'core:request_create' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle"></i> Создать новую заявку
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Фильтры</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'core:request_list' %}" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Статус</label>
+                    <select name="status" class="form-select">
+                        <option value="">Все статусы</option>
+                        <option value="new" {% if selected_status == 'new' %}selected{% endif %}>Новая</option>
+                        <option value="assigned" {% if selected_status == 'assigned' %}selected{% endif %}>Назначена</option>
+                        <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>В работе</option>
+                        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Завершена</option>
+                        <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Отменена</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Тип</label>
+                    <select name="type" class="form-select">
+                        <option value="">Все типы</option>
+                        <option value="repair" {% if selected_type == 'repair' %}selected{% endif %}>Ремонт</option>
+                        <option value="maintenance" {% if selected_type == 'maintenance' %}selected{% endif %}>Обслуживание</option>
+                        <option value="complaint" {% if selected_type == 'complaint' %}selected{% endif %}>Жалоба</option>
+                        <option value="inquiry" {% if selected_type == 'inquiry' %}selected{% endif %}>Запрос информации</option>
+                        <option value="emergency" {% if selected_type == 'emergency' %}selected{% endif %}>Аварийная ситуация</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Приоритет</label>
+                    <select name="priority" class="form-select">
+                        <option value="">Все приоритеты</option>
+                        <option value="low" {% if selected_priority == 'low' %}selected{% endif %}>Низкий</option>
+                        <option value="medium" {% if selected_priority == 'medium' %}selected{% endif %}>Средний</option>
+                        <option value="high" {% if selected_priority == 'high' %}selected{% endif %}>Высокий</option>
+                        <option value="urgent" {% if selected_priority == 'urgent' %}selected{% endif %}>Срочный</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Дом</label>
+                    <select name="building" class="form-select">
+                        <option value="">Все дома</option>
+                        {% for building in buildings %}
+                            <option value="{{ building.id }}" {% if selected_building|stringformat:"i" == building.id|stringformat:"i" %}selected{% endif %}>
+                                {{ building.address }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Применить фильтры
+                        </button>
+                        <a href="{% url 'core:request_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Сбросить фильтры
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Таблица заявок -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Заявки ({{ requests|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Заголовок</th>
+                                <th>Тип</th>
+                                <th>Статус</th>
+                                <th>Приоритет</th>
+                                <th>Дом</th>
+                                <th>Квартира/Этаж</th>
+                                <th>Назначена</th>
+                                <th>Дата создания</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in requests %}
+                                <tr>
+                                    <td><strong>{{ req.id }}</strong></td>
+                                    <td>
+                                        <a href="{% url 'core:request_detail' req.pk %}" class="text-decoration-none">
+                                            {{ req.title|truncatechars:40 }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if req.type == 'repair' %}
+                                            <span class="badge bg-info"><i class="bi bi-tools"></i> Ремонт</span>
+                                        {% elif req.type == 'maintenance' %}
+                                            <span class="badge bg-primary"><i class="bi bi-wrench"></i> Обслуживание</span>
+                                        {% elif req.type == 'complaint' %}
+                                            <span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Жалоба</span>
+                                        {% elif req.type == 'emergency' %}
+                                            <span class="badge bg-danger"><i class="bi bi-lightning"></i> Авария</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ req.get_type_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req.status == 'new' %}
+                                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Новая</span>
+                                        {% elif req.status == 'assigned' %}
+                                            <span class="badge bg-info"><i class="bi bi-person-check"></i> Назначена</span>
+                                        {% elif req.status == 'in_progress' %}
+                                            <span class="badge bg-primary"><i class="bi bi-gear"></i> В работе</span>
+                                        {% elif req.status == 'completed' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Завершена</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Отменена</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req.priority == 'urgent' %}
+                                            <span class="badge bg-danger"><i class="bi bi-exclamation-lg"></i> Срочный</span>
+                                        {% elif req.priority == 'high' %}
+                                            <span class="badge bg-warning"><i class="bi bi-exclamation"></i> Высокий</span>
+                                        {% elif req.priority == 'medium' %}
+                                            <span class="badge bg-info"><i class="bi bi-info-circle"></i> Средний</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Низкий</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req.building.address|truncatechars:30 }}</td>
+                                    <td>
+                                        {% if req.apartment_number %}
+                                            {{ req.apartment_number }}
+                                            {% if req.floor %}/ {{ req.floor }} эт.{% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req.assigned_to %}
+                                            <span class="badge bg-success">{{ req.assigned_to.username }}</span>
+                                        {% else %}
+                                            {% if user.profile.role == 'worker' and req.status == 'new' %}
+                                                <a href="{% url 'core:request_accept' req.pk %}" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-hand-index"></i> Принять
+                                                </a>
+                                            {% elif user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                                                <a href="{% url 'core:request_assign' req.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-person-plus"></i> Назначить
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Не назначена</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req.created_at|date:"d.m.Y" }}<br><small>{{ req.created_at|time:"H:i" }}</small></td>
+                                    <td>
+                                        <a href="{% url 'core:request_detail' req.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Просмотр
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                    <p class="text-muted fs-5">Нет заявок для отображения</p>
+                    {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                        <a href="{% url 'core:request_create' %}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle"></i> Создать первую заявку
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Заявка #{{ request.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="display-6 mb-0">
+                <i class="bi bi-ticket-perforated"></i> Заявка #{{ request.id }} - {{ request.title }}
+            </h1>
+            <div class="d-flex gap-2">
+                <a href="{% url 'core:request_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Назад к списку
+                </a>
+                {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                    <a href="{% url 'core:request_edit' request.pk %}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Редактировать заявку
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column - Request Info -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Основная информация</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Тип заявки:</strong></p>
+                            <p>
+                                {% if request.type == 'repair' %}
+                                    <span class="badge bg-info fs-6"><i class="bi bi-tools"></i> Ремонт</span>
+                                {% elif request.type == 'maintenance' %}
+                                    <span class="badge bg-primary fs-6"><i class="bi bi-wrench"></i> Обслуживание</span>
+                                {% elif request.type == 'complaint' %}
+                                    <span class="badge bg-warning fs-6"><i class="bi bi-exclamation-triangle"></i> Жалоба</span>
+                                {% elif request.type == 'emergency' %}
+                                    <span class="badge bg-danger fs-6"><i class="bi bi-lightning"></i> Аварийная ситуация</span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6">{{ request.get_type_display }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Приоритет:</strong></p>
+                            <p>
+                                {% if request.priority == 'urgent' %}
+                                    <span class="badge bg-danger fs-6"><i class="bi bi-exclamation-lg"></i> Срочный</span>
+                                {% elif request.priority == 'high' %}
+                                    <span class="badge bg-warning fs-6"><i class="bi bi-exclamation"></i> Высокий</span>
+                                {% elif request.priority == 'medium' %}
+                                    <span class="badge bg-info fs-6"><i class="bi bi-info-circle"></i> Средний</span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6">Низкий</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Статус:</strong></p>
+                            <p>
+                                {% if request.status == 'new' %}
+                                    <span class="badge bg-warning fs-6"><i class="bi bi-clock"></i> Новая</span>
+                                {% elif request.status == 'assigned' %}
+                                    <span class="badge bg-info fs-6"><i class="bi bi-person-check"></i> Назначена</span>
+                                {% elif request.status == 'in_progress' %}
+                                    <span class="badge bg-primary fs-6"><i class="bi bi-gear"></i> В работе</span>
+                                {% elif request.status == 'completed' %}
+                                    <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> Завершена</span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6"><i class="bi bi-x-circle"></i> Отменена</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Дата создания:</strong></p>
+                            <p>{{ request.created_at|date:"d.m.Y H:i" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Дом:</strong></p>
+                            <p>{{ request.building.address }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Квартира/Этаж:</strong></p>
+                            <p>
+                                {% if request.apartment_number %}
+                                    {{ request.apartment_number }}
+                                    {% if request.floor %}/ {{ request.floor }} этаж{% endif %}
+                                {% else %}
+                                    <span class="text-muted">Не указана</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Создал:</strong></p>
+                            <p>
+                                {% if request.created_by %}
+                                    {{ request.created_by.get_full_name|default:request.created_by.username }}
+                                {% else %}
+                                    <span class="text-muted">Неизвестно</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Назначен:</strong></p>
+                            <p>
+                                {% if request.assigned_to %}
+                                    <span class="badge bg-success">{{ request.assigned_to.username }}</span>
+                                    {% if request.assigned_at %}
+                                        <br><small class="text-muted">с {{ request.assigned_at|date:"d.m.Y H:i" }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Не назначен</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if request.estimated_completion %}
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <p><strong>Планируемое завершение:</strong></p>
+                                <p>{{ request.estimated_completion|date:"d.m.Y H:i" }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if request.completed_at %}
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <p><strong>Завершена:</strong></p>
+                                <p>{{ request.completed_at|date:"d.m.Y H:i" }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if request.cost_estimate or request.final_cost %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>Оценочная стоимость:</strong></p>
+                                <p>{{ request.cost_estimate }} ₽</p>
+                            </div>
+                            {% if request.final_cost %}
+                                <div class="col-md-6">
+                                    <p><strong>Фактическая стоимость:</strong></p>
+                                    <p>{{ request.final_cost }} ₽</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-12">
+                            <p><strong>Описание:</strong></p>
+                            <div class="alert alert-light">{{ request.description|linebreaks }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> Комментарии ({{ comments|length }})</h5>
+                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addCommentForm">
+                        <i class="bi bi-plus-circle"></i> Добавить комментарий
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="collapse" id="addCommentForm">
+                        <form method="post" action="{% url 'core:request_detail' request.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="add_comment" value="1">
+                            <div class="mb-3">
+                                {{ comment_form.text|as_crispy_field }}
+                            </div>
+                            <div class="mb-3 form-check">
+                                {{ comment_form.is_internal|as_crispy_field }}
+                                <label class="form-check-label" for="{{ comment_form.is_internal.id_for_label }}">
+                                    Внутренний комментарий (не виден клиенту)
+                                </label>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#addCommentForm">
+                                    Отмена
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Отправить
+                                </button>
+                            </div>
+                        </form>
+                        <hr class="my-4">
+                    </div>
+
+                    {% if comments %}
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
+                                                <small class="text-muted ms-2">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                                            </div>
+                                            {% if comment.is_internal %}
+                                                <span class="badge bg-secondary">Внутренний</span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="mb-0">{{ comment.text|linebreaks }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">Нет комментариев</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Actions -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-images"></i> Изображения</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% if request.image1 %}
+                            <div class="col-6">
+                                <a href="{{ request.image1.url }}" target="_blank">
+                                    <img src="{{ request.image1.url }}" class="img-thumbnail" alt="Изображение 1">
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if request.image2 %}
+                            <div class="col-6">
+                                <a href="{{ request.image2.url }}" target="_blank">
+                                    <img src="{{ request.image2.url }}" class="img-thumbnail" alt="Изображение 2">
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if request.image3 %}
+                            <div class="col-6">
+                                <a href="{{ request.image3.url }}" target="_blank">
+                                    <img src="{{ request.image3.url }}" class="img-thumbnail" alt="Изображение 3">
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if not request.image1 and not request.image2 and not request.image3 %}
+                            <div class="col-12 text-center py-3">
+                                <i class="bi bi-image fs-1 text-muted mb-2 d-block"></i>
+                                <p class="text-muted mb-0">Нет изображений</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if can_assign and not request.assigned_to %}
+                            <a href="{% url 'core:request_assign' request.pk %}" class="btn btn-primary">
+                                <i class="bi bi-person-plus"></i> Назначить исполнителя
+                            </a>
+                        {% endif %}
+
+                        {% if user.profile.role == 'worker' and not request.assigned_to and request.status == 'new' %}
+                            <a href="{% url 'core:request_accept' request.pk %}" class="btn btn-success">
+                                <i class="bi bi-hand-index"></i> Принять заявку
+                            </a>
+                        {% endif %}
+
+                        {% if can_update_status %}
+                            <a href="{% url 'core:request_update_status' request.pk %}" class="btn btn-info">
+                                <i class="bi bi-arrow-clockwise"></i> Изменить статус
+                            </a>
+                        {% endif %}
+
+                        {% if request.assigned_to == user and request.status == 'assigned' %}
+                            <form method="post" action="{% url 'core:request_update_status' request.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="in_progress">
+                                <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Начать работу над заявкой?')">
+                                    <i class="bi bi-play-circle"></i> Начать работу
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if request.assigned_to == user and request.status == 'in_progress' %}
+                            <form method="post" action="{% url 'core:request_update_status' request.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="completed">
+                                <button type="submit" class="btn btn-success w-100" onclick="return confirm('Завершить заявку?')">
+                                    <i class="bi bi-check-circle"></i> Завершить работу
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if user.profile.role == 'admin' or user.profile.role == 'manager' %}
+                            <a href="{% url 'core:request_edit' request.pk %}" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Редактировать заявку
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
