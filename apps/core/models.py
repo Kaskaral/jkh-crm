@@ -187,20 +187,20 @@ class RequestHistory(models.Model):
         ordering = ['-changed_at']
 
 
-class BuildingImage(models.Model):
-    """Images of buildings for documentation."""
+#class BuildingImage(models.Model):
+ #   """Images of buildings for documentation."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='buildings/%Y/%m/%d/')
-    description = models.CharField(max_length=255, blank=True, null=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+  #  building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='images')
+  #  image = models.ImageField(upload_to='buildings/%Y/%m/%d/')
+  #  description = models.CharField(max_length=255, blank=True, null=True)
+   # uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Image for {self.building.address}"
+    #def __str__(self):
+     #   return f"Image for {self.building.address}"
 
-    class Meta:
-        verbose_name = 'Изображение дома'
-        verbose_name_plural = 'Изображения домов'
+    #class Meta:
+     #   verbose_name = 'Изображение дома'
+      #  verbose_name_plural = 'Изображения домов'
 
 
 class Notification(models.Model):

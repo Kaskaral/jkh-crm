@@ -7,7 +7,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from .models import (
     UserProfile, Building, Request, RequestComment,
-    RequestHistory, BuildingImage, Notification
+    RequestHistory, Notification
 )
 
 
@@ -58,10 +58,10 @@ class RequestHistoryAdmin(admin.ModelAdmin):
     date_hierarchy = 'changed_at'
 
 
-class BuildingImageAdmin(admin.ModelAdmin):
-    """Admin for building images."""
-    list_display = ['building', 'description', 'uploaded_at']
-    list_filter = ['uploaded_at']
+#class BuildingImageAdmin(admin.ModelAdmin):
+ #   """Admin for building images."""
+   # list_display = ['building', 'description', 'uploaded_at']
+   # list_filter = ['uploaded_at']
 
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -80,5 +80,5 @@ admin.site.register(Building, BuildingAdmin)
 admin.site.register(Request, RequestAdmin)
 admin.site.register(RequestComment, RequestCommentAdmin)
 admin.site.register(RequestHistory, RequestHistoryAdmin)
-admin.site.register(BuildingImage, BuildingImageAdmin)
+#admin.site.register(BuildingImage, BuildingImageAdmin)
 admin.site.register(Notification, NotificationAdmin)
