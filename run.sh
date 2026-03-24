@@ -1,4 +1,11 @@
 #!/bin/bash
+set -e
+
+echo "🔧 Applying database migrations..."
 python manage.py migrate --noinput
+
+echo "📦 Collecting static files..."
 python manage.py collectstatic --noinput
-gunicorn PythonProject6.wsgi:application
+
+echo "✅ Starting Gunicorn..."
+exec gunicorn PythonProject6.wsgi:application
