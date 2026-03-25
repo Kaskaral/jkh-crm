@@ -75,44 +75,19 @@ class RequestCommentForm(forms.ModelForm):
 
 
 class UserRegistrationForm(UserCreationForm):
-    """Extended registration form with profile information."""
-
-    role = forms.ChoiceField(
-        choices=UserProfile.ROLE_CHOICES,
-        required=True,
-        label='Роль'
-    )
-    phone = forms.CharField(
-        max_length=20,
-        required=False,
-        label='Телефон'
-    )
-    address = forms.CharField(
-        max_length=255,
-        required=False,
-        label='Адрес'
-    )
+    email = forms.EmailField(required=False)
+    role = forms.ChoiceField(choices=[('worker', 'Рабочий'), ('manager', 'Менеджер'), ('admin', 'Администратор')])
 
     class Meta:
         model = User
-        fields = [
-            'username', 'email', 'first_name', 'last_name',
-            'password1', 'password2', 'role', 'phone', 'address'
-        ]
+        fields = ('username', 'email', 'password1', 'password2', 'role')
 
     def save(self, commit=True):
-        user = super().save(commit=False)
+        user = super().save(commit=commit)
         if commit:
-            user.save()
-            # Create profile
-            UserProfile.objects.create(
-                user=user,
-                role=self.cleaned_data['role'],
-                phone=self.cleaned_data.get('phone'),
-                address=self.cleaned_data.get('address')
-            )
+            from .models import UserProfile
+            UserProfile.objects.create(user=user, role=self.cleaned_data['role'])
         return user
-
 
 class UserEditForm(UserChangeForm):
     """Form for editing user information."""

@@ -423,20 +423,22 @@ def user_list_view(request):
 
 @login_required
 @user_passes_test(is_admin)
+# apps/core/views.py
 def user_create_view(request):
-    """Create new user."""
+    if request.user.profile.role not in ['admin', 'manager']:
+        messages.error(request, 'Недостаточно прав для создания пользователя.')
+        return redirect('core:request_list')
+
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            messages.success(request, f'Пользователь {user.username} успешно создан.')
+            form.save()
+            messages.success(request, 'Пользователь успешно создан.')
             return redirect('core:user_list')
     else:
         form = UserRegistrationForm()
 
     return render(request, 'core/user_form.html', {'form': form, 'action': 'create'})
-
-
 @login_required
 @user_passes_test(is_admin)
 def user_edit_view(request, pk):
