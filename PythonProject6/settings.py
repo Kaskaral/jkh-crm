@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))  # ← Эта строка О
 SECRET_KEY = 'django-insecure-xw50&eaym**f*8+$f+9=jbmmb!rmdek$x2-#8_te5#a)&kk+tg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Security
 ALLOWED_HOSTS = ['jkh-crm-1.onrender.com', 'localhost', '127.0.0.1']
@@ -166,19 +166,25 @@ REST_FRAMEWORK = {
     ],
 }
 
-
-# Автоматическое создание суперпользователя при запуске (только в продакшене)
+# === Безопасное создание суперпользователя при первом запуске ===
 if not DEBUG and 'DATABASE_URL' in os.environ:
     from django.contrib.auth import get_user_model
 
     User = get_user_model()
-    if not User.objects.filter(is_superuser=True).exists():
-        username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-        email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
-        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123456')
 
-        User.objects.create_superuser(
-            username=username,
-            email=email,
-            password=password
-        )
+    # Создаем суперпользователя только если его ещё нет
+    if not User.objects.filter(is_superuser=True).exists():
+        username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
+        email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
+        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+
+        # Проверяем, что все данные заданы
+        if username and email and password:
+            User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password
+            )
+            print(f"✅ Суперпользователь '{username}' создан.")
+        else:
+            print("⚠️ Переменные DJANGO_SUPERUSER_* не заданы. Суперпользователь не создан.")
