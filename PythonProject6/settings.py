@@ -28,8 +28,14 @@ SECRET_KEY = 'django-insecure-xw50&eaym**f*8+$f+9=jbmmb!rmdek$x2-#8_te5#a)&kk+tg
 DEBUG = False
 
 # Security
-ALLOWED_HOSTS = ['jkh-crm-1.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['jkh-crm-1.onrender.com', 'localhost', '127.0.0.1', 'ALLOWED_HOSTS']
 
+
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host.strip()}"
+    for host in os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
+    if host.strip()
+]
 
 # Application definition
 
