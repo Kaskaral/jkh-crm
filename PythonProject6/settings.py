@@ -166,25 +166,3 @@ REST_FRAMEWORK = {
     ],
 }
 
-# === Безопасное создание суперпользователя при первом запуске ===
-if not DEBUG and 'DATABASE_URL' in os.environ:
-    from django.contrib.auth import get_user_model
-
-    User = get_user_model()
-
-    # Создаем суперпользователя только если его ещё нет
-    if not User.objects.filter(is_superuser=True).exists():
-        username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
-        email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
-        password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
-
-        # Проверяем, что все данные заданы
-        if username and email and password:
-            User.objects.create_superuser(
-                username=username,
-                email=email,
-                password=password
-            )
-            print(f"✅ Суперпользователь '{username}' создан.")
-        else:
-            print("⚠️ Переменные DJANGO_SUPERUSER_* не заданы. Суперпользователь не создан.")
